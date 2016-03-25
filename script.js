@@ -22,10 +22,10 @@ var getMovies = function(){
 		var currentGenreName = item.name;
 		$.ajax({
 			method: 'GET',
-			url: "http://api.themoviedb.org/3/genre/"+currentGenreID+"/movies?api_key=79f81e8b70e985264de2f222934b1bd1&page=2",
+			url: "http://api.themoviedb.org/3/genre/"+currentGenreID+"/movies?api_key=79f81e8b70e985264de2f222934b1bd1&page=3",
 			success: function(data){
 				moviesObj[currentGenreName] = data;
-				if (genresProcessed == 19) placeMovies();
+				if (genresProcessed == 17) placeMovies();
 				genresProcessed++;
 			},
 			error: function(error){
@@ -126,7 +126,7 @@ $('#posters').delegate('a-curvedimage', 'click', function(){
 						for(var prop in movie){
 							if (movie[prop] === parseInt(clickedId) && !found) {
 								found = true;
-								
+
 								$('body').append('<div id="overlay"><div id="background"><h1 id="exit">X</h1><div id="content"><div id="headline"><h1 id="title">'+ movie.title+ '</h1></div><h3 id="synopsis">' + movie.overview +'</h3><div id="trailer">'+trailer+'</div></div></div></div>');
 								$("#overlay").hide();
 								$('#background').css({
