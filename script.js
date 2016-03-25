@@ -1,12 +1,11 @@
 
 var moviesObj = {};
 var genres = {};
-
 //get the list of movie genres and ids
 $.ajax({
 	method: 'GET',
 	url: "http://api.themoviedb.org/3/genre/movie/list?api_key=79f81e8b70e985264de2f222934b1bd1",
-	success: function(data){		
+	success: function(data){
 		moviesObj=data;
 		getMovies();
 	},
@@ -26,7 +25,7 @@ var getMovies = function(){
 		$.ajax({
 			method: 'GET',
 			url: "http://api.themoviedb.org/3/genre/"+currentGenreID+"/movies?api_key=79f81e8b70e985264de2f222934b1bd1&page=2",
-			success: function(data){		
+			success: function(data){
 				moviesObj[currentGenreName] = data;
 				if (genresProcessed == 19) placeMovies();
 				genresProcessed++;
@@ -43,7 +42,8 @@ var counter = 21;
 // use the movie info object to create content on the page
 var placeMovies = function(){
 	//loop for genres
-	for (key in moviesObj){
+	var i = 0;
+	for (var key in moviesObj){
 		var posterRotation = 0;
 		//loop for movies in a genre
 		if (key!=='genres'){
@@ -59,6 +59,8 @@ var placeMovies = function(){
 			counter--;
 		}
 	}
+
+
 }
 
 // Create buttons dynamically
@@ -85,73 +87,63 @@ function animateIn(genre){
 
 // Add hover events for the genre buttons
 function navigateMovies(key){
+	// console.log('navigation to: ' + key);
 	$('#posters').append('<a-animation easing="ease-in" attribute="position" to="0 ' + (key * 7) + ' 0" dur="1500" fill="forwards" ></a-animation>').delay(800);
 }
 
-$('#buttons').delegate('#Action','click', function(){
-	navigateMovies(-6)
-});
-$('#buttons').delegate('#Adventure','click', function(){
-	navigateMovies(-5)
-});
-$('#buttons').delegate('#Animation','click', function(){
-	navigateMovies(-4)
-});
-$('#buttons').delegate('#Comedy','click', function(){
-	navigateMovies(-3)
-});
-$('#buttons').delegate('#Crime','click', function(){
-	navigateMovies(-2)
-});
-$('#buttons').delegate('#Documentary','click', function(){
-	navigateMovies(-1)
-});
-$('#buttons').delegate('#Drama','click', function(){
-	navigateMovies(0)
-});
-$('#buttons').delegate('#Family','click', function(){
-	navigateMovies(1)
-});
-$('#buttons').delegate('#Fantasy','click', function(){
-	navigateMovies(2)
-});
-$('#buttons').delegate('#Foreign','click', function(){
-	navigateMovies(3)
-});
-$('#buttons').delegate('#History','click', function(){
-	navigateMovies(4)
-});
-$('#buttons').delegate('#Horror','click', function(){
-	navigateMovies(5)
-});
-$('#buttons').delegate('#Music','click', function(){
-	navigateMovies(6)
-});
-$('#buttons').delegate('#Mystery','click', function(){
-	navigateMovies(7)
-});
-$('#buttons').delegate('#Romance','click', function(){
-	navigateMovies(8)
-});
+// Elevator for the category navigation
+function elevate(genre, height){
+	// console.log(genre, height);
+	$('#buttons').delegate(genre,'click', function(){
+		navigateMovies(height);
+	});
+}
 
-$('#buttons').delegate('#ScienceFiction','click', function(){
-	navigateMovies(9)
-});
-$('#buttons').delegate('#TVMovie','click', function(){
-	navigateMovies(10)
-});
-$('#buttons').delegate('#Thriller','click', function(){
-	navigateMovies(11)
-});
-$('#buttons').delegate('#War','click', function(){
-	navigateMovies(12)
-});
-$('#buttons').delegate('#Western','click', function(){
-	navigateMovies(13)
-});
+var buttonGenres = ['#Action','#Adventure','#Animation','#Comedy','#Crime','#Documentary','#Drama','#Family','#Fantasy','#Foreign','#History','#Horror','#Music','#Mystery','#Romance','#ScienceFiction','#TVMovie','#Thriller','#War','#Western'];
+var count = -6;
+for(var i = 0; i < buttonGenres.length; i++){
+	elevate(buttonGenres[i], count);
+	count++;
+};
+
+
+var trailer = ''
+//poster click brings up movie details and trailer
 $('#posters').delegate('a-curvedimage', 'click', function(){
-	if ($(this).attr('radius') == 5){
-		$(this).attr('radius', '10').attr('theta-length', '18');
-	} else $(this).attr('radius', '5').attr('theta-length', '40');
-
+	clickedId = $(this).attr('id')
+	$.ajax({
+		method: 'GET',
+		url: 'http://api.themoviedb.org/3/movie/' + clickedId + '/videos?api_key=79f81e8b70e985264de2f222934b1bd1',
+		success: function(data){
+			trailer = '<iframe  width="500" height="275" src="https://www.youtube.com/embed/'+data.results[0].key+'" frameborder="0" allowfullscreen></iframe>'
+			for (var key in moviesObj){
+				if (key!=='genres'){
+					moviesObj[key].results.forEach(function(movie, index){
+						for(var prop in movie){
+							if (movie[prop] === parseInt(clickedId)) {
+								$('body').append('<div id="overlay"><div id="background"><h1 id="exit">X</h1><div id="content"><div id="headline"><h1 id="title">'+ movie.title+ '</h1></div><h3 id="synopsis">' + movie.overview +'</h3><div id="trailer">'+trailer+'</div></div></div></div>');
+								$('#background').css({
+									'background' : 'url(http://crossorigin.me/http://image.tmdb.org/t/p/w1280' + movie.backdrop_path+') no-repeat', 
+									'background-size': 'cover',
+									'filter': 'alpha(Opacity=90)',
+									'opacity' : '.9'
+								});	
+								$('#content').css({
+									'background-color': 'rgba(0,0,0,.5)', 
+								});	
+							}
+						}
+					});
+				}
+			}
+			$('iframe').css('opacity', '100%')
+			$('div').css('cursor', 'auto');
+		},
+		error: function(error){
+			console.log(error);
+		}
+	})
 });
+$('body').delegate('#exit', 'click', function(){
+	$('#overlay').remove();
+})

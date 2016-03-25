@@ -7,11 +7,16 @@
          cursor: none;
          }
       </style>
+      <link rel="stylesheet" href="styles.css">
+      <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
       <script src="https://code.jquery.com/jquery-2.1.1.js"></script>
       <script src="https://aframe.io/releases/latest/aframe.min.js"></script>
-      <script src="http://misterburton.com/local/ideo-sf-panorama/js/aframe-no-click-look-controls.min.js"></script>
+      <script src="aframe-no-click-look-controls.min.js"></script>
    </head>
    <body>
+   <div id="container">
+
+   </div>
       <a-scene fog="type: linear; color: #e9fcfc; far: 30; near: 4">
          <a-entity camera no-click-look-controls="maxyaw:3.5; maxpitch:1.5">
             <a-entity cursor="fuse: false; maxDistance: 30; timeout: 1000"
