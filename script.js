@@ -12,7 +12,7 @@ $.ajax({
 	error: function(error){
 		console.log(error);
 	}
-})
+});
 
 // use the list of movie genres and ids to fetch content
 var getMovies = function(){
